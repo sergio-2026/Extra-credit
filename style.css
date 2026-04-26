@@ -1,0 +1,426 @@
+/*
+  style.css — RetireWise
+  ============================================================
+  All CSS rules below use concepts from the class slides:
+    - CSS custom properties (variables) — Week 4 / 5
+    - Box model (padding, margin, border) — Week 6
+    - Flexbox for layout — referenced in class examples
+    - Class selectors, pseudo-classes — Week 5 / 7
+    - Responsive media queries — Week 6 / 7
+  ============================================================
+*/
+
+
+/* ──────────────────────────────────────────
+   CSS Custom Properties (design tokens)
+   These act like variables — one place to
+   change a color and it updates everywhere.
+   Week 4/5 covered CSS properties and values.
+────────────────────────────────────────── */
+:root {
+  /* Colors — light mode defaults */
+  --bg:      #f7f6f2;   /* page background */
+  --surf:    #f9f8f5;   /* card background */
+  --surfoff: #f0ede8;   /* slightly darker surface */
+  --border:  #d4d1ca;   /* border color */
+  --div:     #e0ddd8;   /* divider line color */
+  --tx:      #28251d;   /* main text */
+  --txm:     #7a7974;   /* muted text */
+  --txf:     #bab9b4;   /* faint text */
+  --pri:     #01696f;   /* brand teal — primary actions */
+  --prih:    #0c4e54;   /* primary hovered */
+  --prihl:   #cedcd8;   /* primary highlight (badge bg) */
+
+  /* Shadows */
+  --sh1: 0 1px 2px rgba(0,0,0,.06);
+  --sh2: 0 4px 12px rgba(0,0,0,.09);
+  --sh3: 0 12px 32px rgba(0,0,0,.13);
+
+  /* Border radii */
+  --r1: .375rem;
+  --r2: .5rem;
+  --r3: .75rem;
+  --r4: 1rem;
+
+  /* Fonts */
+  --fd: 'DM Serif Display', Georgia, serif;
+  --fb: 'DM Sans', 'Helvetica Neue', sans-serif;
+
+  /* Font sizes using clamp so they scale with viewport */
+  --xs:  clamp(.75rem,   .7rem  + .25vw, .875rem);
+  --sm:  clamp(.875rem,  .8rem  + .35vw, 1rem);
+  --bs:  clamp(1rem,    .95rem  + .25vw, 1.125rem);
+  --lg:  clamp(1.125rem, 1rem  + .75vw,  1.5rem);
+  --xl:  clamp(1.5rem,   1.2rem + 1.25vw, 2.25rem);
+  --2xl: clamp(2rem,     1.2rem + 2.5vw,  3.5rem);
+
+  /* Transition shorthand for hover effects */
+  --t: 180ms cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Dark mode overrides — applied by JavaScript when user clicks the toggle */
+[data-theme="dark"] {
+  --bg:      #171614;
+  --surf:    #1c1b19;
+  --surfoff: #242320;
+  --border:  #393836;
+  --div:     #2e2d2b;
+  --tx:      #cdccca;
+  --txm:     #797876;
+  --txf:     #5a5957;
+  --pri:     #4f98a3;
+  --prih:    #227f8b;
+  --prihl:   #273535;
+  --sh1: 0 1px 2px rgba(0,0,0,.25);
+  --sh2: 0 4px 12px rgba(0,0,0,.35);
+  --sh3: 0 12px 32px rgba(0,0,0,.45);
+}
+
+
+/* ──────────────────────────────────────────
+   Reset and base — Week 2 / 6
+────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;   /* include padding in width (Week 6) */
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--fb);
+  font-size: var(--bs);
+  color: var(--tx);
+  background: var(--bg);
+  line-height: 1.6;
+  transition: background .3s, color .3s;
+}
+
+/* Make images and buttons behave predictably */
+img, svg   { display: block; max-width: 100%; }
+input, button, select { font: inherit; color: inherit; }
+button   { cursor: pointer; background: none; border: none; }
+table    { border-collapse: collapse; width: 100%; }
+p        { max-width: 72ch; }  /* readable line length */
+
+/* Centered content wrapper — max-width layout (Week 4) */
+.wrap {
+  max-width: 960px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+
+/* ──────────────────────────────────────────
+   Header — sticky bar at the top (Week 7)
+────────────────────────────────────────── */
+header {
+  background: var(--surf);
+  border-bottom: 1px solid var(--div);
+  padding: .9rem 0;
+  position: sticky;   /* stays at top while you scroll */
+  top: 0;
+  z-index: 20;
+  box-shadow: var(--sh1);
+}
+
+/* Flex row: logo on left, toggle on right */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo link */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  text-decoration: none;
+  color: var(--tx);
+}
+.logo-icon  { width: 34px; height: 34px; color: var(--pri); }
+.logo-name  { font-family: var(--fd); font-size: var(--lg); line-height: 1; }
+
+/* Theme toggle button */
+.thmbtn {
+  width: 40px; height: 40px;
+  border-radius: var(--r3);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--txm);
+  transition: background var(--t), color var(--t);
+}
+.thmbtn:hover { background: var(--surfoff); color: var(--tx); }
+
+
+/* ──────────────────────────────────────────
+   Hero section — big intro text
+────────────────────────────────────────── */
+.hero {
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+/* Pill-shaped badge label */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--prihl);
+  color: var(--pri);
+  font-size: var(--xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .2rem .75rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.hero h1 {
+  font-family: var(--fd);
+  font-size: var(--2xl);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.hero p { color: var(--txm); margin-inline: auto; }
+
+
+/* ──────────────────────────────────────────
+   Card — white box with shadow (Week 6)
+────────────────────────────────────────── */
+.card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r4);
+  padding: 2rem;
+  box-shadow: var(--sh2);
+  margin-bottom: 2rem;
+}
+.card h2 {
+  font-family: var(--fd);
+  font-size: var(--xl);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+
+/* ──────────────────────────────────────────
+   Form grid — 2 columns, collapses on mobile
+   Week 6 (display) + Week 7 (media queries)
+────────────────────────────────────────── */
+.fgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 600px) {
+  .fgrid { grid-template-columns: 1fr; }   /* one column on small screens */
+}
+
+/* Individual field group */
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.fg label {
+  font-size: var(--sm);
+  font-weight: 600;
+  color: var(--txm);
+  letter-spacing: .04em;
+}
+.hint   { font-size: var(--xs); color: var(--txf); }
+
+/* Error message — hidden by default, shown by JavaScript */
+.errmsg { display: none; font-size: var(--xs); color: #c0392b; }
+.errmsg.show { display: block; }   /* JS adds .show class to reveal this */
+
+/* Input wrapper for prefix/suffix symbols ($, %) */
+.iw { position: relative; display: flex; align-items: center; }
+.ipfx, .isfx {
+  position: absolute;
+  font-size: var(--sm);
+  font-weight: 500;
+  color: var(--txm);
+  pointer-events: none;
+  z-index: 1;
+}
+.ipfx { left: .75rem; }    /* $ sits on the left */
+.isfx { right: .75rem; }   /* % sits on the right */
+
+/* Text input styling */
+.fc {
+  width: 100%;
+  padding: .7rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  font-size: var(--bs);
+  color: var(--tx);
+  transition: border-color var(--t), box-shadow var(--t);
+  -moz-appearance: textfield;   /* hide number spinners */
+}
+.fc::-webkit-outer-spin-button,
+.fc::-webkit-inner-spin-button { -webkit-appearance: none; }
+.fc:focus {
+  outline: none;
+  border-color: var(--pri);
+  box-shadow: 0 0 0 3px rgba(1, 105, 111, .18);
+}
+.has-pfx .fc { padding-left: 2rem; }    /* make room for $ */
+.has-sfx .fc { padding-right: 2rem; }   /* make room for % */
+
+/* Submit button */
+.btncalc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--pri);
+  color: #fff;
+  font-size: var(--bs);
+  font-weight: 600;
+  border-radius: var(--r3);
+  transition: background var(--t), transform var(--t), box-shadow var(--t);
+  box-shadow: var(--sh1);
+}
+.btncalc:hover {
+  background: var(--prih);
+  transform: translateY(-1px);
+  box-shadow: var(--sh2);
+}
+.btncalc:active { transform: translateY(0); }
+
+
+/* ──────────────────────────────────────────
+   Results section
+   Starts hidden; JS removes .hidden to show
+   (classList pattern — Week 11 / 12)
+────────────────────────────────────────── */
+.hidden { display: none; }
+
+/* Big gradient header with the monthly income number */
+.rh {
+  background: linear-gradient(135deg, var(--pri) 0%, #0a8a92 100%);
+  color: #fff;
+  border-radius: var(--r4);
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: var(--sh3);
+  animation: fadeUp .45s ease both;
+}
+.rh .rl { font-size: var(--xs); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .75; margin-bottom: .75rem; }
+.rh .ra { font-family: var(--fd); font-size: var(--2xl); font-weight: 400; line-height: 1; margin-bottom: .75rem; }
+.rh .rs { font-size: var(--sm); opacity: .7; }
+
+/* Three stat boxes in a row */
+.sgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  animation: fadeUp .45s .1s ease both;
+}
+@media (max-width: 600px) { .sgrid { grid-template-columns: 1fr; } }
+
+.sc { background: var(--surf); border: 1px solid var(--border); border-radius: var(--r3); padding: 1.25rem; box-shadow: var(--sh1); }
+.sc .sl { font-size: var(--xs); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--txm); margin-bottom: .5rem; }
+.sc .sv { font-family: var(--fd); font-size: var(--xl); font-weight: 400; }
+.sc .ss { font-size: var(--xs); color: var(--txf); margin-top: .25rem; }
+
+/* Chart card */
+.chartcard {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r4);
+  padding: 2rem;
+  box-shadow: var(--sh1);
+  margin-bottom: 2rem;
+  animation: fadeUp .45s .2s ease both;
+}
+.chartcard h3 { font-family: var(--fd); font-size: var(--lg); font-weight: 400; margin-bottom: 1.5rem; }
+.cw { position: relative; height: 280px; }
+
+/* Table card */
+.tcard {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--r4);
+  overflow: hidden;
+  box-shadow: var(--sh1);
+  margin-bottom: 4rem;
+  animation: fadeUp .45s .3s ease both;
+}
+.ttop { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--div); }
+.ttop h3 { font-family: var(--fd); font-size: var(--lg); font-weight: 400; }
+.ttop p  { font-size: var(--sm); color: var(--txm); margin-top: .25rem; }
+.tscroll { overflow-x: auto; }
+
+/* Data table */
+.dt thead th {
+  background: var(--surfoff);
+  padding: .75rem 1rem;
+  text-align: left;
+  font-size: var(--xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--txm);
+  border-bottom: 1px solid var(--div);
+  white-space: nowrap;
+}
+.dt tbody tr { border-bottom: 1px solid var(--div); transition: background var(--t); }
+.dt tbody tr:last-child { border-bottom: none; }
+.dt tbody tr:hover { background: var(--surfoff); }
+.dt td { padding: .75rem 1rem; font-size: var(--sm); white-space: nowrap; }
+.dt td:not(:first-child):not(:nth-child(2)) { text-align: right; }
+
+/* Final row highlight */
+.fr { background: var(--prihl) !important; }
+.fr td { font-weight: 700; }
+
+/* Balance column color */
+.bc { font-weight: 600; color: var(--pri); }
+
+
+/* ──────────────────────────────────────────
+   Footer
+────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--div);
+  padding: 2rem 0;
+  text-align: center;
+  font-size: var(--xs);
+  color: var(--txf);
+}
+footer a { color: var(--pri); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+footer p + p { margin-top: .5rem; }
+
+
+/* ──────────────────────────────────────────
+   Animation — results fade up when they appear
+────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced-motion user preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+}
