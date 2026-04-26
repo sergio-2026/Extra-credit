@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetireWise — Retirement Calculator</title>
+  <!-- Chart.js CDN — see JS comments for what is / isn't from course slides -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{--bg:#f7f6f2;--surf:#f9f8f5;--surf2:#fbfbf9;--surfoff:#f0ede8;--border:#d4d1ca;--div:#e0ddd8;--tx:#28251d;--txm:#7a7974;--txf:#bab9b4;--pri:#01696f;--prih:#0c4e54;--prihl:#cedcd8;--gold:#d19900;--ok:#437a22;--sh1:0 1px 2px oklch(0.2 0.01 80/.06);--sh2:0 4px 12px oklch(0.2 0.01 80/.09);--sh3:0 12px 32px oklch(0.2 0.01 80/.13);--r1:.375rem;--r2:.5rem;--r3:.75rem;--r4:1rem;--fd:'DM Serif Display',Georgia,serif;--fb:'DM Sans','Helvetica Neue',sans-serif;--xs:clamp(.75rem,.7rem + .25vw,.875rem);--sm:clamp(.875rem,.8rem + .35vw,1rem);--bs:clamp(1rem,.95rem + .25vw,1.125rem);--lg:clamp(1.125rem,1rem + .75vw,1.5rem);--xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);--2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);--t:180ms cubic-bezier(.16,1,.3,1)}
+    [data-theme="dark"]{--bg:#171614;--surf:#1c1b19;--surf2:#201f1d;--surfoff:#242320;--border:#393836;--div:#2e2d2b;--tx:#cdccca;--txm:#797876;--txf:#5a5957;--pri:#4f98a3;--prih:#227f8b;--prihl:#273535;--gold:#e8af34;--ok:#6daa45;--sh1:0 1px 2px oklch(0 0 0/.25);--sh2:0 4px 12px oklch(0 0 0/.35);--sh3:0 12px 32px oklch(0 0 0/.45)}
+    @media(prefers-color-scheme:dark){:root:not([data-theme]){--bg:#171614;--surf:#1c1b19;--surf2:#201f1d;--surfoff:#242320;--border:#393836;--div:#2e2d2b;--tx:#cdccca;--txm:#797876;--txf:#5a5957;--pri:#4f98a3;--prih:#227f8b;--prihl:#273535;--gold:#e8af34;--ok:#6daa45;--sh1:0 1px 2px oklch(0 0 0/.25);--sh2:0 4px 12px oklch(0 0 0/.35);--sh3:0 12px 32px oklch(0 0 0/.45)}}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:4rem}
+    body{min-height:100dvh;font-family:var(--fb);font-size:var(--bs);color:var(--tx);background:var(--bg);line-height:1.6;transition:background .3s,color .3s}
+    img,svg{display:block;max-width:100%}input,button,select{font:inherit;color:inherit}button{cursor:pointer;background:none;border:none}table{border-collapse:collapse;width:100%}p{max-width:72ch}
+    .wrap{max-width:960px;margin-inline:auto;padding-inline:1.25rem}
+
+    /* Header */
+    header{background:var(--surf);border-bottom:1px solid var(--div);padding:.9rem 0;position:sticky;top:0;z-index:20;box-shadow:var(--sh1)}
+    .hdr{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--tx)}
+    .logo-icon{width:34px;height:34px;color:var(--pri);flex-shrink:0}
+    .logo-name{font-family:var(--fd);font-size:var(--lg);line-height:1}
+    .thmbtn{width:40px;height:40px;border-radius:var(--r3);display:flex;align-items:center;justify-content:center;color:var(--txm);transition:background var(--t),color var(--t)}
+    .thmbtn:hover{background:var(--surfoff);color:var(--tx)}
+
+    /* Hero */
+    .hero{padding:3rem 0 2rem;text-align:center}
+    .badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--prihl);color:var(--pri);font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .75rem;border-radius:9999px;margin-bottom:1.25rem}
+    .hero h1{font-family:var(--fd);font-size:var(--2xl);font-weight:400;line-height:1.1;margin-bottom:1rem}
+    .hero p{color:var(--txm);margin-inline:auto}
+
+    /* Card */
+    .card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r4);padding:2rem;box-shadow:var(--sh2);margin-bottom:2rem}
+    .card h2{font-family:var(--fd);font-size:var(--xl);font-weight:400;margin-bottom:1.5rem}
+
+    /* Form */
+    .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+    @media(max-width:600px){.fgrid{grid-template-columns:1fr}}
+    .fg{display:flex;flex-direction:column;gap:.5rem}
+    .fg label{font-size:var(--sm);font-weight:600;color:var(--txm);letter-spacing:.04em}
+    .hint{font-size:var(--xs);color:var(--txf)}
+    .errmsg{display:none;font-size:var(--xs);color:#c0392b;margin-top:2px}
+    .errmsg.show{display:block}
+    .iw{position:relative;display:flex;align-items:center}
+    .ipfx,.isfx{position:absolute;font-size:var(--sm);font-weight:500;color:var(--txm);pointer-events:none;z-index:1}
+    .ipfx{left:.75rem}.isfx{right:.75rem}
+    .fc{width:100%;padding:.7rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);font-size:var(--bs);color:var(--tx);transition:border-color var(--t),box-shadow var(--t);-moz-appearance:textfield}
+    .fc::-webkit-outer-spin-button,.fc::-webkit-inner-spin-button{-webkit-appearance:none}
+    .fc:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px color-mix(in oklab,var(--pri) 18%,transparent)}
+    .has-pfx .fc{padding-left:2rem}.has-sfx .fc{padding-right:2rem}
+    .btncalc{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:1rem 1.5rem;background:var(--pri);color:#fff;font-size:var(--bs);font-weight:600;border-radius:var(--r3);transition:background var(--t),transform var(--t),box-shadow var(--t);box-shadow:var(--sh1)}
+    .btncalc:hover{background:var(--prih);transform:translateY(-1px);box-shadow:var(--sh2)}
+    .btncalc:active{transform:translateY(0)}
+
+    /* Results */
+    #results{display:none}#results.show{display:block}
+    .rh{background:linear-gradient(135deg,var(--pri) 0%,#0a8a92 100%);color:#fff;border-radius:var(--r4);padding:2.5rem 2rem;margin-bottom:2rem;text-align:center;box-shadow:var(--sh3);animation:fu .45s ease both}
+    .rh .rl{font-size:var(--xs);font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-bottom:.75rem}
+    .rh .ra{font-family:var(--fd);font-size:var(--2xl);font-weight:400;line-height:1;margin-bottom:.75rem}
+    .rh .rs{font-size:var(--sm);opacity:.7}
+    .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;animation:fu .45s .1s ease both}
+    @media(max-width:600px){.sgrid{grid-template-columns:1fr}}
+    .sc{background:var(--surf);border:1px solid var(--border);border-radius:var(--r3);padding:1.25rem;box-shadow:var(--sh1)}
+    .sc .sl{font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txm);margin-bottom:.5rem}
+    .sc .sv{font-family:var(--fd);font-size:var(--xl);font-weight:400}
+    .sc .ss{font-size:var(--xs);color:var(--txf);margin-top:.25rem}
+    .chartcard{background:var(--surf);border:1px solid var(--border);border-radius:var(--r4);padding:2rem;box-shadow:var(--sh1);margin-bottom:2rem;animation:fu .45s .2s ease both}
+    .chartcard h3{font-family:var(--fd);font-size:var(--lg);font-weight:400;margin-bottom:1.5rem}
+    .cw{position:relative;height:280px}
+    .tcard{background:var(--surf);border:1px solid var(--border);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh1);margin-bottom:4rem;animation:fu .45s .3s ease both}
+    .ttop{padding:1.25rem 1.5rem;border-bottom:1px solid var(--div)}
+    .ttop h3{font-family:var(--fd);font-size:var(--lg);font-weight:400}
+    .ttop p{font-size:var(--sm);color:var(--txm);margin-top:.25rem}
+    .tscroll{overflow-x:auto}
+    .dt thead th{background:var(--surfoff);padding:.75rem 1rem;text-align:left;font-size:var(--xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txm);border-bottom:1px solid var(--div);white-space:nowrap}
+    .dt tbody tr{border-bottom:1px solid var(--div);transition:background var(--t)}
+    .dt tbody tr:last-child{border-bottom:none}
+    .dt tbody tr:hover{background:var(--surfoff)}
+    .dt td{padding:.75rem 1rem;font-size:var(--sm);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .dt td:not(:first-child):not(:nth-child(2)){text-align:right}
+    .bc{font-weight:600;color:var(--pri)}
+    .fr{background:var(--prihl)!important}.fr td{font-weight:700}
+
+    /* Footer */
+    footer{border-top:1px solid var(--div);padding:2rem 0;text-align:center;font-size:var(--xs);color:var(--txf)}
+    footer a{color:var(--pri);text-decoration:none}footer a:hover{text-decoration:underline}
+    footer p+p{margin-top:.5rem}
+
+    @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="hdr">
+      <a href="#" class="logo" aria-label="RetireWise home">
+        <svg class="logo-icon" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <circle cx="18" cy="18" r="15" stroke="currentColor" stroke-width="2"/>
+          <path d="M18 9v9l5.5 3.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 27 Q14 22 18 24 Q22 26 26 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <polyline points="24,18 26,20 28,18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="logo-name">RetireWise</span>
+      </a>
+      <button class="thmbtn" data-theme-toggle aria-label="Switch to dark mode">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 20h20L12 4z"/></svg>
+        Retirement Planning Tool
+      </div>
+      <h1>Plan Your Path to<br>Financial Freedom</h1>
+      <p>Enter your details below to see your projected nest egg, monthly retirement income, and a complete year-by-year savings breakdown.</p>
+    </section>
+
+    <div class="card">
+      <h2>Your Retirement Inputs</h2>
+      <form id="calcForm" novalidate>
+        <div class="fgrid">
+          <div class="fg">
+            <label for="currentAge">Current Age</label>
+            <div class="iw"><input class="fc" type="number" id="currentAge" min="18" max="80" value="30" required></div>
+            <span class="hint">Your age today (18–80)</span>
+            <span class="errmsg" id="errA">Please enter a valid age between 18 and 80.</span>
+          </div>
+          <div class="fg">
+            <label for="retirementAge">Desired Retirement Age</label>
+            <div class="iw"><input class="fc" type="number" id="retirementAge" min="20" max="90" value="65" required></div>
+            <span class="hint">Must be older than your current age</span>
+            <span class="errmsg" id="errR">Retirement age must be greater than current age.</span>
+          </div>
+          <div class="fg">
+            <label for="monthlyContrib">Monthly Contribution</label>
+            <div class="iw has-pfx"><span class="ipfx">$</span><input class="fc" type="number" id="monthlyContrib" min="0" value="500" required></div>
+            <span class="hint">Amount you save each month</span>
+            <span class="errmsg" id="errM">Please enter 0 or more.</span>
+          </div>
+          <div class="fg">
+            <label for="annualRate">Annual Interest Rate (Assumption)</label>
+            <div class="iw has-sfx"><input class="fc" type="number" id="annualRate" min="0" max="30" step="0.1" value="7" required><span class="isfx">%</span></div>
+            <span class="hint">Expected yearly portfolio growth</span>
+            <span class="errmsg" id="errI">Please enter a rate between 0% and 30%.</span>
+          </div>
+          <div class="fg">
+            <label for="withdrawalRate">Annual Withdrawal Rate at Retirement</label>
+            <div class="iw has-sfx"><input class="fc" type="number" id="withdrawalRate" min="0.1" max="20" step="0.1" value="4" required><span class="isfx">%</span></div>
+            <span class="hint">% of nest egg withdrawn per year (e.g., the 4% rule)</span>
+            <span class="errmsg" id="errW">Please enter a rate between 0.1% and 20%.</span>
+          </div>
+        </div>
+        <button type="submit" class="btncalc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Calculate My Retirement
+        </button>
+      </form>
+    </div>
+
+    <section id="results" aria-live="polite">
+      <div class="rh">
+        <div class="rl">Estimated Monthly Retirement Income</div>
+        <div class="ra" id="monthlyIncome">$0</div>
+        <div class="rs" id="incomeSub">Based on a 4% annual withdrawal from your nest egg</div>
+      </div>
+      <div class="sgrid">
+        <div class="sc"><div class="sl">Nest Egg at Retirement</div><div class="sv" id="finalBalance">$0</div><div class="ss" id="statYears">0 years of growth</div></div>
+        <div class="sc"><div class="sl">Total Contributed</div><div class="sv" id="totalContrib">$0</div><div class="ss" id="statMonths">0 monthly payments</div></div>
+        <div class="sc"><div class="sl">Total Investment Gains</div><div class="sv" id="totalGains">$0</div><div class="ss">Interest &amp; compounding returns</div></div>
+      </div>
+      <div class="chartcard">
+        <h3>Portfolio Balance Growth Over Time</h3>
+        <div class="cw"><canvas id="growthChart" aria-label="Line chart of retirement balance over time" role="img"></canvas></div>
+      </div>
+      <div class="tcard">
+        <div class="ttop">
+          <h3>Year-by-Year Breakdown</h3>
+          <p>Your projected ending balance at the close of each year leading up to retirement.</p>
+        </div>
+        <div class="tscroll">
+          <table class="dt">
+            <thead>
+              <tr><th>Calendar Year</th><th>Your Age</th><th>Annual Contribution</th><th>Interest Earned</th><th>Ending Balance</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>RetireWise is for educational purposes only and does not constitute financial advice.</p>
+    <p>Built with plain JavaScript &amp; <a href="https://www.chartjs.org" target="_blank" rel="noopener noreferrer">Chart.js</a> &mdash; COMP 484 Extra Credit</p>
+  </div>
+</footer>
+
+<script>
+  /*
+  ================================================================
+    RETIREMENT CALCULATOR  —  JavaScript
+  ================================================================
+
+  FROM COURSE SLIDES (Weeks 9–10):
+    ✅ document.getElementById()         → Week 9 / 10
+    ✅ element.innerHTML                 → Week 9 / 10
+    ✅ var / let declarations            → Week 9
+    ✅ Named functions                   → Week 10
+    ✅ Arrays + .push()                  → Week 10
+    ✅ for loops                         → Week 9
+    ✅ Conditionals  (if / else)         → Week 9
+    ✅ Number() conversion               → HW 9
+    ✅ Math.round()                      → HW 9 Math object
+    ✅ new Date().getFullYear()          → HW 9 Date object
+    ✅ addEventListener (DOM events)     → Week 10
+
+  ⚠️ OUTSIDE COURSE SLIDES (explicitly flagged):
+    🔶 Chart.js library
+         Not in slides. It draws the line/area chart using <canvas>.
+         Slides-only alternative: remove the entire Chart.js block
+         below — the table is the equivalent output with no library.
+    🔶 .toLocaleString()
+         Slides taught Number() conversion; this is an extension.
+         Slides-only alternative: write your own comma inserter.
+    🔶 e.preventDefault()
+         Not in slides. Stops the browser from reloading on submit.
+         Slides-only alternative: change the button to
+           <button type="button" onclick="calcRetire()">
+         and remove the addEventListener entirely.
+    🔶 .scrollIntoView()
+         Not in slides. Smooth-scrolls to results after calculation.
+         Safe to delete — results will simply appear in place.
+    🔶 getComputedStyle()
+         Not in slides. Reads CSS variables to theme the chart.
+         Only needed because of Chart.js; delete with that block.
+  ================================================================
+  */
+
+  /* ── Theme toggle ─────────────────────────────────────── */
+  (function () {
+    var theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var btn   = document.querySelector('[data-theme-toggle]');
+    document.documentElement.setAttribute('data-theme', theme);
+
+    function syncBtn() {
+      if (theme === 'dark') {
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+        btn.setAttribute('aria-label', 'Switch to light mode');
+      } else {
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        btn.setAttribute('aria-label', 'Switch to dark mode');
+      }
+    }
+
+    btn.addEventListener('click', function () {          // addEventListener — FROM SLIDES (Week 10)
+      theme = (theme === 'dark') ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      syncBtn();
+      if (growthChart) { syncChartColors(); }
+    });
+    syncBtn();
+  })();
+
+  var growthChart = null;   // holds the Chart.js instance
+
+  /* formatCurrency: 12345.6 → "$12,346"
+     Uses Math.round() (HW9) + .toLocaleString() (⚠️ outside slides) */
+  function formatCurrency(num) {
+    return '$' + Math.round(num).toLocaleString('en-US');
+  }
+
+  /* ⚠️ OUTSIDE SLIDES: reads CSS vars to theme Chart.js */
+  function getCSSColors() {
+    var s = getComputedStyle(document.documentElement);
+    return {
+      primary:  s.getPropertyValue('--pri').trim(),
+      textMuted:s.getPropertyValue('--txm').trim(),
+      divider:  s.getPropertyValue('--div').trim()
+    };
+  }
+  function syncChartColors() {
+    var c = getCSSColors();
+    growthChart.data.datasets[0].borderColor          = c.primary;
+    growthChart.data.datasets[0].backgroundColor      = c.primary + '28';
+    growthChart.data.datasets[0].pointBackgroundColor = c.primary;
+    growthChart.options.scales.x.ticks.color  = c.textMuted;
+    growthChart.options.scales.y.ticks.color  = c.textMuted;
+    growthChart.options.scales.x.grid.color   = c.divider;
+    growthChart.options.scales.y.grid.color   = c.divider;
+    growthChart.update();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     calcRetire() — main calculation function
+     ════════════════════════════════════════════════════════ */
+  function calcRetire() {
+
+    /* 1. Read inputs — getElementById FROM SLIDES (Week 9/10) */
+    var currentAge     = Number(document.getElementById('currentAge').value);
+    var retirementAge  = Number(document.getElementById('retirementAge').value);
+    var monthlyPmt     = Number(document.getElementById('monthlyContrib').value);
+    var annualRate     = Number(document.getElementById('annualRate').value);
+    var withdrawalRate = Number(document.getElementById('withdrawalRate').value);
+
+    /* 2. Clear old errors — for loop FROM SLIDES (Week 9) */
+    var errIds = ['errA','errR','errM','errI','errW'];
+    for (var i = 0; i < errIds.length; i++) {
+      document.getElementById(errIds[i]).className = 'errmsg';
+    }
+
+    /* 3. Validate — conditionals FROM SLIDES (Week 9) */
+    var bad = false;
+    if (isNaN(currentAge) || currentAge < 18 || currentAge > 80)         { document.getElementById('errA').className = 'errmsg show'; bad = true; }
+    if (isNaN(retirementAge) || retirementAge <= currentAge)              { document.getElementById('errR').className = 'errmsg show'; bad = true; }
+    if (isNaN(monthlyPmt) || monthlyPmt < 0)                              { document.getElementById('errM').className = 'errmsg show'; bad = true; }
+    if (isNaN(annualRate) || annualRate < 0 || annualRate > 30)           { document.getElementById('errI').className = 'errmsg show'; bad = true; }
+    if (isNaN(withdrawalRate) || withdrawalRate < 0.1 || withdrawalRate > 20) { document.getElementById('errW').className = 'errmsg show'; bad = true; }
+    if (bad) { return; }
+
+    /* 4. Setup — let FROM SLIDES (Week 9) */
+    var years       = retirementAge - currentAge;
+    var mthRate     = (annualRate / 100) / 12;
+    var balance     = 0;
+    var thisYear    = new Date().getFullYear();   // Date object — from HW9
+
+    /* 5. Arrays for chart + table — FROM SLIDES (Week 10) */
+    var chartLabels   = [];
+    var chartBalances = [];
+    var tableHTML     = '';
+
+    /* 6. Year-by-year compound interest — nested for loops FROM SLIDES (Weeks 9–10) */
+    for (var yr = 1; yr <= years; yr++) {               // outer loop: each year
+      var yrInterest = 0;
+      for (var mo = 1; mo <= 12; mo++) {                // inner loop: each month
+        var interest = balance * mthRate;
+        yrInterest   = yrInterest + interest;
+        balance      = balance + interest + monthlyPmt;
+      }
+      var age     = currentAge + yr;
+      var isFinal = (yr === years);
+
+      chartLabels.push('Age ' + age);                   // .push() FROM SLIDES (Week 10)
+      chartBalances.push(Math.round(balance));
+
+      /* Build table HTML with + concatenation — innerHTML pattern FROM SLIDES */
+      var rowAttr = isFinal ? ' class="fr"' : '';
+      tableHTML = tableHTML + '<tr' + rowAttr + '>';
+      tableHTML = tableHTML + '<td>' + (thisYear + yr) + '</td>';
+      tableHTML = tableHTML + '<td>' + age + '</td>';
+      tableHTML = tableHTML + '<td>' + formatCurrency(monthlyPmt * 12) + '</td>';
+      tableHTML = tableHTML + '<td>' + formatCurrency(yrInterest) + '</td>';
+      tableHTML = tableHTML + '<td class="bc">' + formatCurrency(balance) + '</td>';
+      tableHTML = tableHTML + '</tr>';
+    }
+
+    /* 7. Summary values */
+    var finalBal     = balance;
+    var totalContrib = monthlyPmt * 12 * years;
+    var totalGains   = finalBal - totalContrib;
+    var annualIncome = finalBal * (withdrawalRate / 100);
+    var monthIncome  = annualIncome / 12;
+
+    /* 8. Update DOM — getElementById + innerHTML FROM SLIDES (Week 9/10) */
+    document.getElementById('monthlyIncome').innerHTML = formatCurrency(monthIncome);
+    document.getElementById('incomeSub').innerHTML     = 'Based on a ' + withdrawalRate + '% annual withdrawal from ' + formatCurrency(finalBal);
+    document.getElementById('finalBalance').innerHTML  = formatCurrency(finalBal);
+    document.getElementById('totalContrib').innerHTML  = formatCurrency(totalContrib);
+    document.getElementById('totalGains').innerHTML    = formatCurrency(totalGains);
+    document.getElementById('statYears').innerHTML     = years + ' years of contributions';
+    document.getElementById('statMonths').innerHTML    = (years * 12) + ' monthly payments of ' + formatCurrency(monthlyPmt);
+    document.getElementById('tableBody').innerHTML     = tableHTML;   // writes entire table body
+    document.getElementById('results').className       = 'show';
+
+    /* ────────────────────────────────────────────────────
+       CHART.JS BLOCK  ⚠️ OUTSIDE COURSE SLIDES
+       ─────────────────────────────────────────────────────
+       Chart.js is a 3rd-party library loaded from CDN.
+       It is NOT covered in the Week 9 or Week 10 slides.
+
+       Slides-only alternative: delete everything from here
+       down to END CHART.JS — the table above is the
+       equivalent plain-JavaScript output.
+    ──────────────────────────────────────────────────── */
+    var c   = getCSSColors();
+    var ctx = document.getElementById('growthChart');
+    if (growthChart) { growthChart.destroy(); }
+
+    growthChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'Portfolio Balance',
+          data:  chartBalances,
+          borderColor:          c.primary,
+          backgroundColor:      c.primary + '28',
+          borderWidth:          2.5,
+          fill:                 true,
+          tension:              0.4,
+          pointRadius:          chartLabels.length > 25 ? 0 : 4,
+          pointHoverRadius:     6,
+          pointBackgroundColor: c.primary
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function (ctx) { return '  Balance: ' + formatCurrency(ctx.raw); } } }
+        },
+        scales: {
+          x: { ticks: { color: c.textMuted, maxTicksLimit: 12, font: { family: "'DM Sans',sans-serif", size: 12 } }, grid: { color: c.divider } },
+          y: { ticks: { color: c.textMuted, font: { family: "'DM Sans',sans-serif", size: 12 },
+            callback: function (v) {
+              if (v >= 1000000) { return '$' + (v/1000000).toFixed(1) + 'M'; }
+              if (v >= 1000)    { return '$' + (v/1000).toFixed(0) + 'K'; }
+              return '$' + v;
+            }
+          }, grid: { color: c.divider } }
+        }
+      }
+    });
+    /* END CHART.JS */
+
+    /* ⚠️ OUTSIDE SLIDES: scrollIntoView — delete this line if not needed */
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* Form submit — addEventListener FROM SLIDES (Week 10)
+     ⚠️ e.preventDefault() is OUTSIDE slides.
+        Slides-only alternative: use <button type="button" onclick="calcRetire()">
+        and remove this addEventListener block entirely.               */
+  document.getElementById('calcForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    calcRetire();
+  });
+</script>
+</body>
+</html>
