@@ -9,16 +9,16 @@
     Chart.js — loaded from CDN.
     ⚠️ This is an OUTSIDE library, NOT in the course slides.
     It draws the line chart on the page.
-    Everything else on this page uses plain HTML, CSS, and JS from class.
+    Everything else on this page uses plain HTML, CSS, and JS.
   -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <!-- Google Fonts — same way we link external CSS in class -->
+  <!-- Google Fonts — same way we link external CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
 
-  <!-- Our own external CSS file (same pattern as all class projects) -->
+  <!-- external CSS file -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -62,7 +62,7 @@
       <section class="hero">
         <div class="badge">Retirement Planning Tool</div>
         <h1>Plan Your Path to Financial Freedom</h1>
-        <p>Enter your details below to see your projected nest egg, monthly retirement income, and a complete year-by-year savings breakdown.</p>
+        <p>Enter your details below to see your projected portfolio value, monthly retirement income, and a year-by-year savings breakdown.</p>
       </section>
 
 
@@ -117,7 +117,7 @@
                 <span class="isfx">%</span>
               </div>
               <span class="hint">Expected yearly portfolio growth</span>
-              <span class="errmsg" id="errI">Please enter a rate between 0% and 30%.</span>
+              <span class="errmsg" id="errI">Please enter a rate between 7% and 16%.</span>
             </div>
 
             <!-- Withdrawal Rate -->
@@ -127,8 +127,8 @@
                 <input class="fc" type="number" id="withdrawalRate" min="0.1" max="20" step="0.1" value="4">
                 <span class="isfx">%</span>
               </div>
-              <span class="hint">% of nest egg withdrawn per year (e.g., the 4% rule)</span>
-              <span class="errmsg" id="errW">Please enter a rate between 0.1% and 20%.</span>
+              <span class="hint">% of portolio value withdrawn per year (e.g., the 4% rule)</span>
+              <span class="errmsg" id="errW">Please enter a rate between 0.1% and 21%.</span>
             </div>
 
           </div>
@@ -151,13 +151,13 @@
         <div class="rh">
           <div class="rl">Estimated Monthly Retirement Income</div>
           <div class="ra" id="monthlyIncome">$0</div>
-          <div class="rs" id="incomeSub">Based on a 4% annual withdrawal from your nest egg</div>
+          <div class="rs" id="incomeSub">Based on a 4% annual withdrawal from your portfolio value</div>
         </div>
 
         <!-- Three stat boxes -->
         <div class="sgrid">
           <div class="sc">
-            <div class="sl">Nest Egg at Retirement</div>
+            <div class="sl">Portfolio Value at Retirement</div>
             <div class="sv" id="finalBalance">$0</div>
             <div class="ss" id="statYears">0 years of growth</div>
           </div>
