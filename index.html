@@ -2,229 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RetireWise — Retirement Calculator</title>
+  <title>Retirement Chart (Extra Credit)</title>
 
-  <!--
-    Chart.js — loaded from CDN.
-    ⚠️ This is an OUTSIDE library, NOT in the course slides.
-    It draws the line chart on the page.
-    Everything else on this page uses plain HTML, CSS, and JS.
-  -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-  <!-- Google Fonts — same way we link external CSS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
-
-  <!-- external CSS file -->
+  <!-- Simple CSS file -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Chart.js library (new library I researched) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-<body>
+<body class="light-mode">
+  <h1>Retirement Saver</h1>
 
-  <!-- ═══════════════════════════════════════════
-       HEADER — logo + dark/light toggle button
-  ═══════════════════════════════════════════ -->
-  <header>
-    <div class="wrap">
-      <div class="hdr">
+  <!-- Button to switch page between light and dark mode -->
+  <button id="themeButton">Dark</button>
 
-        <!-- Logo link (anchor tag — Week 3) -->
-        <a href="#" class="logo">
-          <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-            <circle cx="18" cy="18" r="15" stroke="currentColor" stroke-width="2"/>
-            <path d="M18 9v9l5.5 3.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M10 27 Q14 22 18 24 Q22 26 26 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="logo-name">RetireWise</span>
-        </a>
+  <p>Fill in the boxes and see how your money can grow over time.</p>
 
-        <!-- Toggle button — JavaScript listens for clicks on this (Week 10 events) -->
-        <button class="thmbtn" id="themeToggle">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
+  <form id="calcForm">
+    <label>
+      Current age:
+      <input type="number" id="ageNow" value="30" min="18" max="80">
+    </label>
 
-      </div>
-    </div>
-  </header>
+    <label>
+      Retirement age:
+      <input type="number" id="ageRetire" value="65" min="20" max="90">
+    </label>
 
+    <label>
+      Monthly save amount ($):
+      <input type="number" id="monthlySave" value="500" min="0">
+    </label>
 
-  <!-- ═══════════════════════════════════════════
-       MAIN CONTENT
-  ═══════════════════════════════════════════ -->
-  <main>
-    <div class="wrap">
+    <label>
+      Yearly interest rate (%):
+      <input type="number" id="yearRate" value="7" min="0" max="30" step="0.1">
+    </label>
 
-      <!-- Hero intro text -->
-      <section class="hero">
-        <div class="badge">Retirement Planning Tool</div>
-        <h1>Plan Your Path to Financial Freedom</h1>
-        <p>Enter your details below to see your projected portfolio value, monthly retirement income, and a year-by-year savings breakdown.</p>
-      </section>
+    <button type="submit">Calculate</button>
+  </form>
 
+  <div id="summary">
+    <p>Final balance: <span id="finalBalance">$0</span></p>
+    <p>Estimated monthly income in retirement (4% rule): <span id="monthlyIncome">$0</span></p>
+  </div>
 
-      <!-- Input form card -->
-      <div class="card">
-        <h2>Your Retirement Inputs</h2>
+  <!-- Chart.js will draw the line chart inside this canvas -->
+  <canvas id="growthChart" width="400" height="220"></canvas>
 
-        <!--
-          novalidate tells the browser not to show its own error popups.
-          We handle validation ourselves in script.js (Week 9 conditionals).
-        -->
-        <form id="calcForm" novalidate>
-          <div class="fgrid">
-
-            <!-- Current Age -->
-            <div class="fg">
-              <label for="currentAge">Current Age</label>
-              <div class="iw">
-                <input class="fc" type="number" id="currentAge" min="18" max="80" value="30">
-              </div>
-              <span class="hint">Your age today (18–80)</span>
-              <!-- Error message — shown/hidden by JavaScript -->
-              <span class="errmsg" id="errA">Please enter a valid age between 18 and 80.</span>
-            </div>
-
-            <!-- Retirement Age -->
-            <div class="fg">
-              <label for="retirementAge">Desired Retirement Age</label>
-              <div class="iw">
-                <input class="fc" type="number" id="retirementAge" min="20" max="90" value="65">
-              </div>
-              <span class="hint">Must be older than your current age</span>
-              <span class="errmsg" id="errR">Retirement age must be greater than current age.</span>
-            </div>
-
-            <!-- Monthly Contribution -->
-            <div class="fg">
-              <label for="monthlyContrib">Monthly Contribution</label>
-              <div class="iw has-pfx">
-                <span class="ipfx">$</span>
-                <input class="fc" type="number" id="monthlyContrib" min="0" value="500">
-              </div>
-              <span class="hint">Amount you save each month</span>
-              <span class="errmsg" id="errM">Please enter 0 or more.</span>
-            </div>
-
-            <!-- Annual Interest Rate -->
-            <div class="fg">
-              <label for="annualRate">Annual Interest Rate</label>
-              <div class="iw has-sfx">
-                <input class="fc" type="number" id="annualRate" min="0" max="30" step="0.1" value="7">
-                <span class="isfx">%</span>
-              </div>
-              <span class="hint">Expected yearly portfolio growth</span>
-              <span class="errmsg" id="errI">Please enter a rate between 7% and 16%.</span>
-            </div>
-
-            <!-- Withdrawal Rate -->
-            <div class="fg">
-              <label for="withdrawalRate">Annual Withdrawal Rate</label>
-              <div class="iw has-sfx">
-                <input class="fc" type="number" id="withdrawalRate" min="0.1" max="20" step="0.1" value="4">
-                <span class="isfx">%</span>
-              </div>
-              <span class="hint">% of portolio value withdrawn per year (e.g., the 4% rule)</span>
-              <span class="errmsg" id="errW">Please enter a rate between 0.1% and 21%.</span>
-            </div>
-
-          </div>
-
-          <!-- Submit button — form submit event is caught in script.js -->
-          <button type="submit" class="btncalc">Calculate My Retirement</button>
-        </form>
-      </div>
-
-
-      <!-- ═══════════════════════════════════════════
-           RESULTS SECTION
-           Starts hidden (.hidden class via CSS).
-           JavaScript removes that class to show it.
-           This is the classList pattern from Week 11/12.
-      ═══════════════════════════════════════════ -->
-      <section id="results" class="hidden">
-
-        <!-- Big headline number: monthly income -->
-        <div class="rh">
-          <div class="rl">Estimated Monthly Retirement Income</div>
-          <div class="ra" id="monthlyIncome">$0</div>
-          <div class="rs" id="incomeSub">Based on a 4% annual withdrawal from your portfolio value</div>
-        </div>
-
-        <!-- Three stat boxes -->
-        <div class="sgrid">
-          <div class="sc">
-            <div class="sl">Portfolio Value at Retirement</div>
-            <div class="sv" id="finalBalance">$0</div>
-            <div class="ss" id="statYears">0 years of growth</div>
-          </div>
-          <div class="sc">
-            <div class="sl">Total Contributed</div>
-            <div class="sv" id="totalContrib">$0</div>
-            <div class="ss" id="statMonths">0 monthly payments</div>
-          </div>
-          <div class="sc">
-            <div class="sl">Total Investment Gains</div>
-            <div class="sv" id="totalGains">$0</div>
-            <div class="ss">Interest &amp; compounding returns</div>
-          </div>
-        </div>
-
-        <!-- Chart — canvas element required by Chart.js (⚠️ outside slides) -->
-        <div class="chartcard">
-          <h3>Portfolio Balance Over Time</h3>
-          <div class="cw">
-            <!--
-              The <canvas> tag is just like any other HTML element.
-              Chart.js will use it as a drawing surface.
-              ⚠️ Chart.js itself is outside the slides.
-            -->
-            <canvas id="growthChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Year-by-year data table -->
-        <div class="tcard">
-          <div class="ttop">
-            <h3>Year-by-Year Breakdown</h3>
-            <p>Your projected ending balance at the close of each year.</p>
-          </div>
-          <div class="tscroll">
-            <table class="dt">
-              <thead>
-                <tr>
-                  <th>Calendar Year</th>
-                  <th>Your Age</th>
-                  <th>Annual Contribution</th>
-                  <th>Interest Earned</th>
-                  <th>Ending Balance</th>
-                </tr>
-              </thead>
-              <!-- JavaScript fills in the rows below (innerHTML — Week 9/10) -->
-              <tbody id="tableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-    </div>
-  </main>
-
-
-  <!-- ═══════════════════════════════════════════
-       FOOTER
-  ═══════════════════════════════════════════ -->
-  <footer>
-    <div class="wrap">
-      <p>RetireWise is for educational purposes only and does not constitute financial advice.</p>
-      <p>Built with plain JavaScript &amp; <a href="https://www.chartjs.org" target="_blank" rel="noopener">Chart.js</a> — COMP 484 Extra Credit</p>
-    </div>
-  </footer>
-
-  <!-- External JS — same placement as all class projects (bottom of body) -->
+  <!-- Your JavaScript file -->
   <script src="script.js"></script>
 </body>
 </html>
