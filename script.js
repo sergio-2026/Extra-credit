@@ -30,7 +30,8 @@ var finalBalanceSpan = document.getElementById("finalBalance");
 var monthlyIncomeSpan = document.getElementById("monthlyIncome");
 
 // We keep the Chart.js chart object here so we can update it later
-var chart = null;
+var chart = null;   // for the line chart
+var chart2 = null;  // for the bar chart
 
 // Turn a number into a simple money string like "$12345"
 function formatMoney(amount) {
@@ -108,6 +109,10 @@ form.addEventListener("submit", function (event) {
   var yearlyIncome = finalBalance * 0.04;
   var monthlyIncome = yearlyIncome / 12;
 
+  // Calculate total contributions and total interest earned
+  var totalContributions = monthlySave * months;
+  var totalInterest = Math.round(finalBalance - totalContributions);
+
   // Show results on the page
   finalBalanceSpan.textContent = formatMoney(finalBalance);
   monthlyIncomeSpan.textContent = formatMoney(monthlyIncome);
@@ -139,4 +144,21 @@ form.addEventListener("submit", function (event) {
       responsive: false
     }
   });
+
+  // Make a new bar chart with Chart.js
+  var ctx2 = document.getElementById("breakdownChart");
+  if (chart2) { chart2.destroy(); }
+  chart2 = new Chart(ctx2, {
+    type: "bar",
+    data: {
+      labels: ["Total Contributions", "Total Interest Earned"],
+      datasets: [{
+        label: "Breakdown",
+        data: [Math.round(totalContributions), totalInterest],
+        backgroundColor: ["rgba(1, 105, 111, 0.6)", "rgba(200, 120, 30, 0.6)"]
+      }]
+    },
+    options: { responsive: false }
+  });
+
 });
