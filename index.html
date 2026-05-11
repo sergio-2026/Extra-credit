@@ -6,96 +6,72 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Main page title -->
+
+  <!-- Page title at the top -->
   <h1>Retirement Growth Calculator</h1>
+  <p id="tagline">Fill in the boxes and see how your money can grow over time.</p>
 
-  <!-- Short helper text under the title -->
-  <p id="tagline">
-    Fill in the boxes and see how your money can grow over time.
-  </p>
-
-  <!-- Button to switch between light and dark mode -->
-  <button id="themeButton" type="button">Dark</button>
-
-  <!-- Wrapper so content does not stretch too wide -->
+  <!-- This wrapper keeps everything from stretching too wide -->
   <div id="pageWrapper">
-    <!-- Left side: form and summary -->
+
+    <!-- Left side: the form and results box -->
     <section id="leftColumn">
-      <!-- Form where the user types their numbers -->
+
+      <!-- The form where the user types their numbers -->
       <form id="calcForm">
         <h2>Inputs</h2>
 
-        <!-- Age right now -->
         <label>
           Your current age:
           <input type="number" id="ageNow" value="30" min="0">
         </label>
 
-        <!-- Age when they want to retire -->
         <label>
           Age when you retire:
           <input type="number" id="ageRetire" value="65" min="1">
         </label>
 
-        <!-- How much they save each month -->
         <label>
           Money you save each month ($):
           <input type="number" id="monthlySave" value="500" min="0">
         </label>
 
-        <!-- Expected yearly interest rate -->
         <label>
           Yearly interest rate (%):
           <input type="number" id="yearRate" value="7" min="0" step="0.1">
         </label>
 
-        <!-- Button that starts the math and the charts -->
         <button type="submit">Calculate</button>
       </form>
 
-      <!-- Box that shows the main results -->
+      <!-- Box that shows the final numbers -->
       <div id="summary">
         <h2>Results</h2>
-        <p>
-          Final balance:
-          <span id="finalBalance">$0</span>
-        </p>
-        <p>
-          Estimated monthly income in retirement (4% rule):
-          <span id="monthlyIncome">$0</span>
-        </p>
+        <p>Final balance: <span id="finalBalance">$0</span></p>
+        <p>Monthly income (4% rule): <span id="monthlyIncome">$0</span></p>
       </div>
     </section>
 
-    <!-- Right side: all three charts -->
+    <!-- Right side: both charts -->
     <section id="rightColumn">
-      <!-- Line chart: balance over time -->
+
+      <!-- Line chart -->
       <h2>Balance Over Time</h2>
       <canvas id="growthChart" width="600" height="280"></canvas>
-      <p class="chart-note">
-        This line shows how your account balance grows as the years go by.
-      </p>
+      <p class="chart-note">This line shows how your balance grows each year you save.</p>
 
-      <!-- Bar chart: total contributions vs interest -->
+      <!-- Bar chart -->
       <h2>Final Balance Breakdown</h2>
       <canvas id="breakdownChart" width="600" height="260"></canvas>
-      <p class="chart-note">
-        This bar chart compares the money you put in and the money earned from interest.
-      </p>
+      <p class="chart-note">This bar chart shows what you put in vs what interest added.</p>
 
-      <!-- NEW doughnut chart: share from savings vs share from interest -->
-      <h2>Savings vs Interest Share</h2>
-      <canvas id="shareChart" width="600" height="260"></canvas>
-      <p class="chart-note">
-        This doughnut chart shows what percent of your final balance comes from your savings and from interest growth.
-      </p>
     </section>
   </div>
 
-  <!-- Chart.js library from a CDN (official way to add it) -->
+  <!-- Chart.js library from the internet (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Our own script file -->
+  <!-- My JavaScript file -->
   <script src="script.js"></script>
 </body>
 </html>
