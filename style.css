@@ -2,84 +2,199 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #f4f4f4;  /* light gray base color */
   color: #222;
   padding: 20px;
+  margin: 0;
 }
+
+/* Main title at the top */
 
 h1 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 4px;
+  color: #014b5b;           /* deep teal */
 }
 
-/* Light / dark mode switch button */
+/* Small line under the title */
+
+#tagline {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+/* Wrapper so content sits in the middle of the screen */
+
+#pageWrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Two columns on wide screens, stacked on small screens */
+
+#leftColumn,
+#rightColumn {
+  margin-bottom: 20px;
+}
+
+/* Simple float layout to keep it in slide-level CSS */
+
+#leftColumn {
+  float: left;
+  width: 340px;
+}
+
+#rightColumn {
+  margin-left: 360px;  /* leaves room for the left column */
+}
+
+/* Clear the floats at the end of the wrapper */
+
+#pageWrapper::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Section titles inside the columns */
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 20px;
+  color: #333;
+}
+
+/* Theme button under the title */
 
 #themeButton {
   display: block;
-  margin: 0 auto 20px auto;
-  padding: 8px 16px;
+  margin: 0 auto 16px auto;
+  padding: 8px 20px;
+  background-color: #014b5b;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;      /* pill shape */
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#themeButton:hover {
+  background-color: #026d7a;
 }
 
 /* Form box */
 
 form {
-  max-width: 400px;
-  margin: 0 auto 20px auto;
-  padding: 12px;
+  max-width: 320px;
+  margin: 0 auto 16px auto;
+  padding: 12px 14px;
   background-color: #ffffff;
-  border: 1px solid #ccc;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 label {
   display: block;
   margin-bottom: 10px;
+  font-size: 14px;
 }
 
 input[type="number"] {
   width: 100%;
   padding: 4px;
   margin-top: 4px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 form button[type="submit"] {
   margin-top: 10px;
   padding: 8px 16px;
+  background-color: #f59e0b;  /* warm gold */
+  color: #222;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+  background-color: #fbbf24;
 }
 
 /* Summary box */
 
 #summary {
-  max-width: 400px;
+  max-width: 320px;
   margin: 0 auto 20px auto;
-  padding: 12px;
+  padding: 12px 14px;
   background-color: #ffffff;
-  border: 1px solid #ccc;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 #summary span {
   font-weight: bold;
 }
 
-/* Chart box */
+/* Chart area */
 
 canvas {
   display: block;
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
   background-color: #ffffff;
-  border: 1px solid #ccc;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
-/* Dark mode styles */
+/* Short note text under each chart */
+
+.chart-note {
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+  margin: 6px 0 18px 0;
+}
+
+/* Light and dark background gradients */
+
+body.light-mode {
+  background: linear-gradient(#f7fbfb, #f3e6cf);
+}
 
 body.dark-mode {
-  background-color: #222;
-  color: #f4f4f4;
+  background: linear-gradient(#111827, #020617);
+  color: #f9fafb;
 }
+
+/* Dark mode card and chart colors */
 
 body.dark-mode form,
 body.dark-mode #summary,
 body.dark-mode canvas {
-  background-color: #333;
-  border-color: #666;
+  background-color: #1f2933;
+  border-color: #4b5563;
+}
+
+/* Make small screens stack the layout nicely */
+
+@media (max-width: 800px) {
+  #leftColumn,
+  #rightColumn {
+    float: none;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #rightColumn {
+    margin-top: 10px;
+  }
 }
